@@ -5,7 +5,7 @@
 >
 > This repository currently exists only to support my own local Home Assistant installation while I develop and test Home Manager.
 >
-> **Please do not install or rely on this repository yet.** It is not packaged, documented, secured, tested, or supported as a general-purpose community project. Configuration, APIs, data models, images, and update behavior may change without notice.
+> **Please do not install or rely on this repository yet.** It has not been packaged, documented, security-reviewed, tested, or supported for general-purpose community deployment. Configuration, APIs, data models, images, and update behavior may change without notice.
 
 ## Current status
 
@@ -37,3 +37,7 @@ The image contains only the application runtime needed by Home Assistant. Runtim
 Home Assistant can consume a public third-party app repository and a public GHCR image without requiring GitHub credentials. This repository exists primarily to provide that update path for my own Home Assistant instance.
 
 I may make Home Manager suitable for wider use later. Until that happens, **treat everything here as development infrastructure for a personal installation, not as a distributable product.**
+
+## Reuse and support
+
+No community support, compatibility commitment, or installation guidance is currently offered. This repository does not currently include an open-source license granting reuse or redistribution rights.
