@@ -19,8 +19,8 @@ jobs:
         id: image
         shell: bash
         run: |
-          docker pull ghcr.io/tuliocastro/family-documents:latest
-          version="$(docker inspect --format '{{ index .Config.Labels "io.hass.version" }}' ghcr.io/tuliocastro/family-documents:latest)"
+          docker pull ghcr.io/tuliocastro/amd64-family-documents:latest
+          version="$(docker inspect --format '{{ index .Config.Labels "io.hass.version" }}' ghcr.io/tuliocastro/amd64-family-documents:latest)"
           if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::Published image has an invalid Home Assistant version label: ${version}"
             exit 1
