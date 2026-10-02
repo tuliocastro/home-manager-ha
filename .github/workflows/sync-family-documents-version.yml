@@ -1,0 +1,47 @@
+name: Sync Family Documents version
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    name: Sync latest published image version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Read latest image version
+        id: image
+        shell: bash
+        run: |
+          docker pull ghcr.io/tuliocastro/family-documents:latest
+          version="$(docker inspect --format '{{ index .Config.Labels "io.hass.version" }}' ghcr.io/tuliocastro/family-documents:latest)"
+          if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Published image has an invalid Home Assistant version label: ${version}"
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Update Home Assistant app metadata
+        shell: bash
+        env:
+          VERSION: ${{ steps.image.outputs.version }}
+        run: |
+          current="$(sed -n 's/^version:[[:space:]]*"\([^"]*\)".*/\1/p' family-documents/config.yaml)"
+          if [[ "${current}" == "${VERSION}" ]]; then
+            echo "Already at ${VERSION}"
+            exit 0
+          fi
+
+          sed -i -E 's/^version:[[:space:]]*".*"/version: "'"\${VERSION}"'"/' family-documents/config.yaml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add family-documents/config.yaml
+          git commit -m "Update Family Documents to ${VERSION}"
+          git push
