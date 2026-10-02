@@ -14,7 +14,7 @@ ingress_port: 8099
 panel_icon: mdi:file-document-multiple-outline
 panel_title: Family Documents
 ports: {}
-image: ghcr.io/tuliocastro/family-documents
+image: ghcr.io/tuliocastro/{arch}-family-documents
 options:
   supabase_url: null
   supabase_secret_key: null
