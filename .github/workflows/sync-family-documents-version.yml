@@ -50,6 +50,12 @@ jobs:
             exit 0
           fi
 
+          newest="$(printf '%s\n%s\n' "${current}" "${VERSION}" | sort -V | tail -n 1)"
+          if [[ -n "${current}" && "${newest}" != "${VERSION}" ]]; then
+            echo "Ignoring older version ${VERSION}; repository already exposes ${current}"
+            exit 0
+          fi
+
           sed -i -E 's/^version:[[:space:]]*".*"/version: "'"${VERSION}"'"/' family-documents/config.yaml
 
           git config user.name "github-actions[bot]"
