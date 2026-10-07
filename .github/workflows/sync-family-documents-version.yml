@@ -2,6 +2,11 @@ name: Sync Family Documents version
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        description: Exact published Family Documents version to expose
+        required: false
+        type: string
   schedule:
     - cron: "17 * * * *"
 
@@ -15,14 +20,21 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Read latest image version
+      - name: Read published image version
         id: image
         shell: bash
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
         run: |
-          docker pull ghcr.io/tuliocastro/amd64-family-documents:latest
-          version="$(docker inspect --format '{{ index .Config.Labels "io.hass.version" }}' ghcr.io/tuliocastro/amd64-family-documents:latest)"
+          tag="${REQUESTED_VERSION:-latest}"
+          docker pull "ghcr.io/tuliocastro/amd64-family-documents:${tag}"
+          version="$(docker inspect --format '{{ index .Config.Labels "io.hass.version" }}' "ghcr.io/tuliocastro/amd64-family-documents:${tag}")"
           if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::Published image has an invalid Home Assistant version label: ${version}"
+            exit 1
+          fi
+          if [[ -n "${REQUESTED_VERSION}" && "${version}" != "${REQUESTED_VERSION}" ]]; then
+            echo "::error::Requested ${REQUESTED_VERSION}, but image label reports ${version}"
             exit 1
           fi
           echo "version=${version}" >> "$GITHUB_OUTPUT"
