@@ -19,7 +19,7 @@ options:
   supabase_url: null
   supabase_secret_key: null
   gemini_query_api_key: null
-  gemini_query_model: gemini-2.5-flash-lite
+  gemini_query_model: gemini-3.5-flash-lite
 schema:
   supabase_url: url
   supabase_secret_key: password
