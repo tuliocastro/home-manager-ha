@@ -60,6 +60,7 @@ jobs:
 
           # Read only notes baked into this exact published image, never private PR metadata.
           image="ghcr.io/tuliocastro/amd64-family-documents:${VERSION}"
+          docker pull "${image}"
           container="$(docker create "${image}")"
           trap 'docker rm -f "${container}" >/dev/null 2>&1 || true' EXIT
           docker cp "${container}:/CHANGELOG.md" "$RUNNER_TEMP/release-notes.md"
