@@ -44,11 +44,8 @@ jobs:
         env:
           VERSION: ${{ steps.image.outputs.version }}
         run: |
+          set -euo pipefail
           current="$(sed -n 's/^version:[[:space:]]*"\([^"]*\)".*/\1/p' family-documents/config.yaml)"
-          if [[ "${current}" == "${VERSION}" ]]; then
-            echo "Already at ${VERSION}"
-            exit 0
-          fi
 
           newest="$(printf '%s\n%s\n' "${current}" "${VERSION}" | sort -V | tail -n 1)"
           if [[ -n "${current}" && "${newest}" != "${VERSION}" ]]; then
@@ -56,10 +53,46 @@ jobs:
             exit 0
           fi
 
-          sed -i -E 's/^version:[[:space:]]*".*"/version: "'"${VERSION}"'"/' family-documents/config.yaml
+          if [[ "${current}" == "${VERSION}" ]] && [[ -f family-documents/CHANGELOG.md ]] && grep -Fxq "## ${VERSION}" family-documents/CHANGELOG.md; then
+            echo "Version and release notes already synchronized at ${VERSION}"
+            exit 0
+          fi
+
+          # Read only notes baked into this exact published image, never private PR metadata.
+          image="ghcr.io/tuliocastro/amd64-family-documents:${VERSION}"
+          docker pull "${image}"
+          container="$(docker create "${image}")"
+          trap 'docker rm -f "${container}" >/dev/null 2>&1 || true' EXIT
+          docker cp "${container}:/CHANGELOG.md" "$RUNNER_TEMP/release-notes.md"
+          test -s "$RUNNER_TEMP/release-notes.md"
+          if [[ "$(head -n 1 "$RUNNER_TEMP/release-notes.md")" != "## ${VERSION}" ]]; then
+            echo "::error::Release notes do not match published image version ${VERSION}"
+            exit 1
+          fi
+
+          if [[ "${current}" != "${VERSION}" ]]; then
+            sed -i -E 's/^version:[[:space:]]*".*"/version: "'"${VERSION}"'"/' family-documents/config.yaml
+          fi
+
+          if [[ ! -f family-documents/CHANGELOG.md ]] || ! grep -Fxq "## ${VERSION}" family-documents/CHANGELOG.md; then
+            {
+              printf '# Changelog\n\n'
+              cat "$RUNNER_TEMP/release-notes.md"
+              if [[ -f family-documents/CHANGELOG.md ]]; then
+                printf '\n'
+                sed '1{/^# Changelog$/d;}' family-documents/CHANGELOG.md | sed '/./,$!d'
+              fi
+            } > "$RUNNER_TEMP/new-changelog.md"
+            mv "$RUNNER_TEMP/new-changelog.md" family-documents/CHANGELOG.md
+          fi
+
+          if git diff --quiet -- family-documents/config.yaml family-documents/CHANGELOG.md; then
+            echo "Already synchronized at ${VERSION}"
+            exit 0
+          fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add family-documents/config.yaml
-          git commit -m "Update Family Documents to ${VERSION}"
+          git add family-documents/config.yaml family-documents/CHANGELOG.md
+          git commit -m "Update Family Documents and changelog to ${VERSION}"
           git push
