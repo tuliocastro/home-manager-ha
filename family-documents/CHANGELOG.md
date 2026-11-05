@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.143
+
+### Improved
+- Document details now show the cached Google Drive folder path for the saved file location.
+- The folder path is display-only and does not change Drive files or document metadata.
+
 ## 0.3.142
 
 ### Improved
