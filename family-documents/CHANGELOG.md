@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.144
+
+### Improved
+- To Do task archiving now uses the shared cancel-first confirmation dialog.
+- Cancelling archive leaves the task active; confirming preserves its existing history.
+- Document details now show the cached Google Drive folder path for the saved file location.
+- The folder path is display-only and does not change Drive files or document metadata.
+
 ## 0.3.143
 
 ### Improved
