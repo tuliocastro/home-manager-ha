@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.145
+
+### Improved
+- Shopping list quantity controls now increase or decrease quantities by one per tap.
+- Shopping item entry is now free text without a dropdown of saved Staples.
+- Quick-add Staples are ordered by how often the household has bought them.
+
 ## 0.3.144
 
 ### Improved
