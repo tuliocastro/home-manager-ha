@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.147
+
+### Improved
+- Prepared a read-only household Home summary for upcoming attention cards and calendar views, with clear indicators when source data is incomplete.
+
 ## 0.3.146
 
 ### Improved
