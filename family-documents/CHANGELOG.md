@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.146
+
+### Improved
+- Improved the internal organization of document lists and processing status views to support future dashboard updates, while preserving existing actions and navigation.
+
 ## 0.3.145
 
 ### Improved
